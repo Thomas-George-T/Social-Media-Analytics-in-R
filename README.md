@@ -29,4 +29,10 @@ https://www.kaggle.com/kazanova/sentiment140
 	1. Correlation analysis between users and months/sentiments.
 	2. distribution function that users tweet about certain sentiment during certain months of the year.
 
-Discuss with TA about initial work
+Discuss with TA about initial work -- Friday at 4:45pm.
+
+##Professor's Notes for Time series
+- RQ analysis: make some changes on embedding.dim,time.lag, radius and write your own interpretations.
+- graphs from lab1
+- complexity and permutation - Inclusing our Interpretation of them
+
