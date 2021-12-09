@@ -1,0 +1,31 @@
+---
+title: "Social Media Analytics"
+author: "Group 9 - Thomas George Thomas, Yang Liu, Pratyush Pothuneedi"
+date: "12/8/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# 1.Introduction
+
+## Data Acquisition
+
+
+```{r}
+# Data of the athelets and countries
+tweetsDataRaw <- read.csv('tweets.csv', header = FALSE, sep = ',')
+```
+
+```{r}
+head(tweetsDataRaw)
+```
+
+
+```{r}
+colnames(tweetsDataRaw) <- c("target","ids","date","flag","user","text")
+
+```
+
