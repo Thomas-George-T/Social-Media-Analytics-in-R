@@ -25,17 +25,14 @@ Yang:
 
 	1. Using the extracted month, determine seasonal variance in number of tweets. (Visualize the results)
 	2. Make trends based on months and sentiments. (Visualize the results)
-	3. Using past data, can we predict the sentiments and number of tweets in the future.
 
 Pratyush:
 - **Probability (2-3 BQs):** could include probability distribution calculator, conditional probability, distribution functions, joint distribution, distribution fitting, correlation analysis, or relevant ideas. Feel free to use data visualization to support your answers.
 
-	1. Correlation analysis between users and months/sentiments.
-	2. distribution function that users tweet about certain sentiment during certain months of the year.
+	1. Calculate the probability that each of the sentiments show up in a particular month?
+	2. pmf, cdf table with the dates ( probability of a tweet being posted before a particular date)
 
-Discuss with TA about initial work -- Friday at 4:45pm.
-
-## Professor's Notes for Time series
+## Professor's Notes for Time series - Integrate into Probability
 - RQ analysis: make some changes on embedding.dim,time.lag, radius and write your own interpretations.
 - graphs from lab1
 - complexity and permutation - Inclusing our Interpretation of them
