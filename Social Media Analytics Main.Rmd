@@ -9,7 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, include=FALSE, message=FALSE}
 #Importing the required libraries
 library(tidytext)
 library(tidyverse)
@@ -18,38 +18,58 @@ library(lubridate)
 library(ggplot2)
 library(dplyr)
 library(readr)
+library(knitr)
 ```
 
 
 # 1.Introduction
 
+We take a look at 1.6 million tweets and find interesting patterns s solve our business queries. The techniques used include Text mining, sentimental analysis, probability, building a time series data from the existing data set and clustering related data on various parameters.
+
+## Data Description
+
+The data set contains 1.6 million tweets with the following 6 fields:
+
+- target: the polarity of the tweet (0 = negative, 2 = neutral, 4 = positive)
+- ids: The id of the tweet ( 2087)
+- date: the date of the tweet (Sat May 16 23:58:44 UTC 2009)
+- flag: The query (lyx). If there is no query, then this value is NO_QUERY.
+- user: the user that tweeted (robotickilldozr)
+- text: the text of the tweet (Lyx is cool)
+
 ## Data Acquisition
 
+We acquire the data from Kaggle: https://www.kaggle.com/kazanova/sentiment140
 
-```{r}
+```{r, echo=FALSE}
 # Social Media data from tweets. We renamed the csv file into tweets from th original file name after extraction for easier readability.
 tweetsDataRaw <- read.csv('tweets.csv', header = FALSE)
-```
 
-
-```{r}
+# Adding Column names
 colnames(tweetsDataRaw) <- c("target","ids","date","flag","user","text")
+```
 
+Taking 5 rows and a few columns
+
+```{r, echo=FALSE}
+
+kable(
+  tweetsDataRaw %>%
+  select(ids,date,text) %>%
+  slice(0:5)
+)
 ```
 
 
-```{r}
-head(tweetsDataRaw)
-```
+
+# 2.Analytical Questions
+
+## 1. Finding the frequently used unique words
+
+For this insight, we consider only the "original" thought of the user/author. We Remove stop words, username mentions, replies, and Re-tweets so that we only have the "original" tweets and visualize our findings.
 
 
-# 1. Remove stop words and try to visualize the remaining words. (Visualize the results)
-
-Removing stop words and username mentions from tweets and also removing Re-tweets and replies so that we have only the "original" tweets.
-
-
-```{r}
-
+```{r, echo=FALSE, message=FALSE}
 remove_reg <- "&amp;|&lt;|&gt;"
 tidy_tweets <- tweetsDataRaw %>% 
   filter(!str_detect(text, "^(RT|@)")) %>%
@@ -59,10 +79,10 @@ tidy_tweets <- tweetsDataRaw %>%
          !word %in% str_remove_all(stop_words$word, "'"),
          str_detect(word, "[a-z]"))
 ```
-counting and sorting the words
 
 
-```{r}
+```{r fig.align="center", echo=FALSE, message=FALSE}
+# counting and sorting the words
 tidy_tweets %>%
 count(word, sort = TRUE) %>%
   top_n(15) %>%
@@ -74,14 +94,16 @@ count(word, sort = TRUE) %>%
   coord_flip() +
   labs(y = "Count",
        x = "Unique words",
-       title = "Most frequent words found in tweets")
+       title = "Most frequent used unique words in tweets")
 ```
 
-# 2. Extract different emotions from the tweets. (Visualize the results)
+**Observation:** *Day* is the most frequently used word which has been used around 63,000 times out of the total of 1.6 million tweets. Following that, the words *Time*, *Home*, *love* and *night* have been used around 30,000 times each.
 
-Adding different sentiments to each of the rows.
+## 2. Sentimental Trends of Tweets
 
-```{r}
+By utilizing the nrc library, we find different sentiments in each of the tweets.
+
+```{r, include=FALSE}
 # the lexicon
 nrc_lexicon <- get_sentiments("nrc")
 
@@ -96,9 +118,8 @@ tidy_tweets <- tidy_tweets %>%
 ```
 
 
-Visualizing the results
-
-```{r}
+```{r, echo=FALSE, message=FALSE, results='hide',fig.keep='all'}
+# Visualizing the results
 tidy_tweets %>%
 count(sentiment) %>%
   ggplot(aes(x = sentiment, y = n)) +
@@ -106,12 +127,17 @@ count(sentiment) %>%
   theme(legend.position="none")+
   xlab("Sentiments") +
   ylab("Count")+
-  ggtitle("Total sentiments count")
+  ggtitle("Different Sentiments vs Count")
   theme_minimal()
 
 ```
 
-@Yang Please do this as your 2nd question
+**Observation:** Positive, negative, anticipation are the top three most tweeted sentiments. Another trend is that there are equal number of Anger, disgust and surprise sentiment tweets. A lot of Users have have tweeted about issues that they fear and trust.
+
+
+
+
+@Yang Please do this as your 2nd question in Time series
 # 3. Extract different months from the date column and determine the sentiments related to the month
 
 Adding the month column to the dataset
