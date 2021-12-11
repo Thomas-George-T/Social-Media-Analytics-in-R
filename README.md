@@ -31,7 +31,7 @@ Pratyush:
 	1. Calculate the probability that each of the sentiments show up on a particular day?
 	2. pmf, cdf table with the dates ( probability of a tweet being posted before a particular date)
 
-## Professor's Notes for Time series - Integrate into Probability
+## Professor's Notes for Time series - Integrate into Time series Analysis
 - RQ analysis: make some changes on embedding.dim,time.lag, radius and write your own interpretations.
 - graphs from lab1
 - complexity and permutation - Inclusing our Interpretation of them
