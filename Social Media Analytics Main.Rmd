@@ -11,6 +11,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, include=FALSE, message=FALSE}
 #Importing the required libraries
+```
+
+
+```{r, include=FALSE, message=FALSE}
 library(tidytext)
 library(tidyverse)
 library(stringr)
@@ -43,7 +47,7 @@ We acquire the data from Kaggle: https://www.kaggle.com/kazanova/sentiment140
 
 ```{r, echo=FALSE}
 # Social Media data from tweets. We renamed the csv file into tweets from th original file name after extraction for easier readability.
-tweetsDataRaw <- read.csv('tweets.csv', header = FALSE)
+tweetsDataRaw <- read.csv('C:/dataset/project2/training.csv', header = TRUE, sep = ',')
 
 # Adding Column names
 colnames(tweetsDataRaw) <- c("target","ids","date","flag","user","text")
@@ -141,9 +145,7 @@ count(sentiment) %>%
 # 3. Extract different months from the date column and determine the sentiments related to the month
 
 Adding the month column to the dataset
-
 ```{r}
-
 tidy_tweets <- tidy_tweets %>%
   mutate(elements = str_split(date, fixed(" "), n=6)) %>% 
     mutate(Month = map_chr(elements, 2),
@@ -155,10 +157,115 @@ tidy_tweets <- tidy_tweets %>%
 ```{r}
 tidy_tweets %>%
   group_by(Day,sentiment) %>%
+  filter(sentiment=='positive') %>%
   summarize(Count=n()) %>%
   arrange(desc(Count)) %>%
-  arrange(Day) %>%
-  top_n(5)
+  arrange(Day)
+```
+
+```{r}
+# Visualizing the results
+  pos <-
+  tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='positive') %>%
+  count(sentiment='positive')
+ggplot(data=pos,mapping=aes(x=Day, y=n, group=1)) + geom_line() + xlab('Day') + geom_point()
+
+```
+```{r}
+neg <-
+  tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='negative') %>%
+  count(sentiment='negative')
+ggplot(data=neg,mapping=aes(x=Day, y=n, group=1)) + geom_line() + xlab('Day') + geom_point()
+```
+```{r}
+tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='anticipation') %>%
+  summarize(Count=n()) %>%
+  arrange(desc(Count))
+```
+
+```{r}
+ant <-
+  tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='anticipation') %>%
+  count(sentiment='anticipation')
+ggplot(data=ant,mapping=aes(x=Day, y=n, group=1)) + geom_line() + xlab('Day') + geom_point()
+
+```
+
+```{r}
+tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='joy') %>%
+  summarize(Count=n()) %>%
+  arrange(desc(Count))
+```
+
+
+```{r}
+joy <-
+  tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='joy') %>%
+  count(sentiment='joy')
+ggplot(data=joy,mapping=aes(x=Day, y=n, group=1)) + geom_line() + xlab('Day') + geom_point()
+```
+```{r}
+tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='trust') %>%
+  summarize(Count=n()) %>%
+  arrange(desc(Count))
+```
+
+```{r}
+trust <-
+  tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='trust') %>%
+  count(sentiment='trust')
+ggplot(data=trust,mapping=aes(x=Day, y=n, group=1)) + geom_line() + xlab('Day') + geom_point()
+```
+
+```{r}
+tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='negative') %>%
+  count(sentiment=='negative') %>%
+  ggplot(aes(x = Day , y = n)) +
+  geom_bar(aes(fill='sentiment'),stat = "identity")+
+  theme(legend.position="none")+
+  xlab("Day") +
+  ylab("Count")+
+  ggtitle("Different Day vs negative")
+  theme_minimal()
+```
+
+```{r}
+View(tidy_tweets)
+tweets_day <- 
+  tidy_tweets %>%
+  group_by(Day) %>%
+  summarise(count = n())
+tweets_day
+```
+```{r}
+# Visualizing the results
+tidy_tweets %>%
+count(Day) %>%
+  ggplot(aes(x = Day, y = n)) +
+  geom_bar(aes(fill=Day),stat = "identity")+
+  theme(legend.position="none")+
+  xlab("Day") +
+  ylab("Count")+
+  ggtitle("Different Day vs Count")
+  theme_minimal()
 ```
 
 
