@@ -1,0 +1,430 @@
+---
+title: "Social Media Analytics"
+author: "Group 9 - Thomas George Thomas, Yang Liu, Pratyush Pothuneedi"
+date: "12/8/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE, message=FALSE}
+#Importing the required libraries
+library(tidytext)
+library(tidyverse)
+library(stringr)
+library(lubridate)
+library(ggplot2)
+library(dplyr)
+library(readr)
+library(knitr)
+library(factoextra)
+library(fpc)
+library(clValid)
+library(cluster)
+library(nonlinearTseries)
+library(tm)
+```
+
+
+# 1. Introduction
+
+We take a look at data of 1.6 million twitter users and draw useful insights while exploring interesting patterns. The techniques used include Text mining, sentimental analysis, probability, building a time series data from the existing data set and Hierarchical clustering on text/words.
+
+## 1.1 Data Description
+
+We use two different files in our data sets:
+
+1. The *tweets.csv* data set contains 1.6 million tweets with 6 fields as follows:
+
+- target: the polarity of the tweet (0 = negative, 2 = neutral, 4 = positive)
+- ids: The id of the tweet ( 2087)
+- date: the date of the tweet (Sat May 16 23:58:44 UTC 2009)
+- flag: The query (lyx). If there is no query, then this value is NO_QUERY.
+- user: the user that tweeted (robotickilldozr)
+- text: the text of the tweet (Lyx is cool)
+
+2. The *daily-website-visitors.csv* contains 5 years of daily time series data for several measures of traffic with 2167 records and 8 Columns:
+
+- Row: Unique row number for each record
+- Day: Day of week in text fomr (Sunday, Monday, etc)
+- Day.Of.Week: (Day of week in numeric form (1-7))
+- Date: Date in mm/dd/yyyy format
+- Page.Loads: Daily number of pages loaded
+- Unique.Visits: Daily number of visitors from whose IP addresses there haven't been hits on any page in over 6 hours
+- First.Time.Visits: Number of unique visitors who do not have a cookie identifying them as a previous customer
+- Returning.Visits: Number of unique visitors minus first time visitors
+
+## 1.2 Data Acquisition
+
+We acquire bot the data sets from Kaggle:
+
+1. https://www.kaggle.com/kazanova/sentiment140
+
+2. https://www.kaggle.com/bobnau/daily-website-visitors
+
+```{r, echo=FALSE}
+# Social Media data from tweets. We renamed the csv file into tweets from th original file name after extraction for easier readability.
+tweetsDataRaw <- read.csv('tweets.csv', header = FALSE)
+
+# Adding Column names
+colnames(tweetsDataRaw) <- c("target","ids","date","flag","user","text")
+```
+
+```{r, echo=FALSE}
+
+kable(
+  tweetsDataRaw %>%
+  select(date,text) %>%
+  slice(0:5),
+  caption = "Previewing few columns of Twitter user data set"
+)
+
+page <- read.csv('daily-website-visitors.csv', header = TRUE, sep = ',')
+
+kable(
+  page %>%
+  select(Row,Day,Date,Page.Loads,Unique.Visits) %>%
+  slice(0:5),
+  caption = "Previewing few columns of Daily time series data set."
+)
+
+```
+
+# 2.Analytical Questions 
+## 2.1 Text Mining
+
+### 2.1.1 Finding the frequently used unique words
+
+```{r, include=FALSE}
+remove_reg <- "&amp;|&lt;|&gt;"
+tidy_tweets <- tweetsDataRaw %>% 
+  filter(!str_detect(text, "^(RT|@)")) %>%
+  mutate(text = str_remove_all(text, remove_reg)) %>%
+  unnest_tokens(word, text, token = "tweets", strip_url = TRUE) %>%
+  filter(!word %in% stop_words$word,
+         !word %in% str_remove_all(stop_words$word, "'"),
+         str_detect(word, "[a-z]"))
+```
+
+
+```{r fig.align="center", out.width = '60%', echo=FALSE, message=FALSE}
+# counting and sorting the words
+tidy_tweets %>%
+count(word, sort = TRUE) %>%
+  top_n(15) %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(x = word, y = n, fill= word)) +
+  geom_col() +
+  theme(legend.position="none")+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab(NULL) +
+  coord_flip() +
+  labs(y = "Count",
+       x = "Unique words",
+       title = "Frequently used unique words in tweets")
+```
+For this insight, we consider only the *original* thought of the user/author. We Remove stop words, username mentions, replies, and Re-tweets so that we only have the "original" tweets and visualize our findings.
+
+**Observation:** *Day* is the most frequently used word which has been used around 63,000 times out of the total of 1.6 million tweets. Following that, the words *Time*, *Home*, *love* and *night* have been used around 30,000 times each.
+
+### 2.1.2 Sentimental Trends of Tweets
+
+```{r, include=FALSE}
+# the lexicon
+nrc_lexicon <- get_sentiments("nrc")
+
+# now the job
+tidy_tweets <- tidy_tweets %>%
+             left_join(nrc_lexicon, by="word")
+
+# remove NA's
+tidy_tweets <- tidy_tweets %>%
+  filter(sentiment!= "NA")
+
+```
+
+
+```{r fig.align="center", echo=FALSE, out.width = '60%', message=FALSE, results='hide',fig.keep='all'}
+# Visualizing the results
+tidy_tweets %>%
+count(sentiment) %>%
+  ggplot(aes(x = sentiment, y = n)) +
+  geom_bar(aes(fill=sentiment),stat = "identity")+
+  theme(legend.position="none")+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  xlab("Sentiments") +
+  ylab("Count")+
+  ggtitle("Different Sentiments vs Count")
+  theme_minimal()
+
+```
+By utilizing the nrc library, we find different sentiments in each of the tweets and visualize their counts.
+
+**Observation:** *Positive, negative, anticipation* are the top three most tweeted sentiments. Another trend is that there are equal number of *Anger, disgust and surprise* sentiment tweets. A lot of Users have also tweeted about issues that they *fear and trust.*
+
+
+```{r, include=FALSE}
+# Adding the month column to the data set
+tidy_tweets <- tidy_tweets %>%
+  mutate(elements = str_split(date, fixed(" "), n=6)) %>% 
+    mutate(Month = map_chr(elements, 2),
+           Day = map_chr(elements, 1),
+           date = map_chr(elements, 3),
+           Time = map_chr(elements, 4), .keep="unused")
+
+tidy_tweets$date <- as.integer(tidy_tweets$date)
+
+```
+
+
+## 2.2 Clustering Analysis
+### 2.2.1 Hierarchical clustering words by sentiments
+
+```{r fig.align="center", echo=FALSE, out.width = '70%', message=FALSE, results='hide',fig.keep='last'}
+
+required_tweets <- data.frame(tidy_tweets$word,tidy_tweets$sentiment)
+required_tweets <- required_tweets[50:120, ]
+
+corpus <- Corpus(VectorSource(required_tweets))
+
+tdm <- TermDocumentMatrix(corpus, 
+                          control = list(minWordLength=c(1,Inf)))
+t <- removeSparseTerms(tdm, sparse=0.98)
+m <- as.matrix(t)
+m1 <- t(m) 
+
+distance <- dist(scale(m))
+#print(distance, digits = 2)
+hc <- hclust(distance, method = "ward.D")
+plot(hc, hang=-1)
+rect.hclust(hc, k=12)
+
+```
+Since our data set comprises of text data, we make a corpus and utilize Hierarchical clustering technique. This technique gives us a dendrogram of different words grouped together by sentiments.
+
+**Observation**: The above Dendrogram clusters our sample space into 12 clusters grouped by sentiments. The height of the Dendrogram signifies the distance between the clusters.
+
+
+## 2.3 Probability
+### 2.3.1. Calculating the PMF and CDF
+```{r, include=FALSE}
+tidy_tweets
+tweets_freq <- tidy_tweets %>%
+  select(Month, Day, Time) %>%
+  group_by(Month, Day, Time) %>%
+  summarise(count = n()) %>%
+  group_by(count) %>%
+  summarise(num_days = n()) %>%
+  mutate(pickup_pmf = num_days/sum(num_days)) %>%
+  mutate(pickup_cdf = cumsum(pickup_pmf))
+#tweets_freq$pickup_pmf
+#tweets_freq$pickup_cdf
+```
+
+```{r, echo=FALSE, message=FALSE}
+kable(
+  tweets_freq %>%
+  select(pickup_pmf) %>%
+  slice(0:5),
+  caption = "First 5 records of PMF of the tweet frequency."
+)
+
+kable(
+  tweets_freq %>%
+  select(pickup_cdf)  %>%
+  slice(0:5),
+  caption = "First 5 records of CDF of the tweet frequency"
+)
+```
+
+
+### 2.3.2. Probability Mass Function over Time
+```{r fig.align="center",out.width = '60%', echo=FALSE, message=FALSE}
+ggplot(tweets_freq, aes(count, pickup_pmf)) +
+  geom_bar(stat="identity", fill="steelblue")+
+  theme_bw() +
+  labs( y = ' Probability') +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("PMF of tweets vs Time")+
+  scale_x_continuous("Time", labels = as.character(tweets_freq$count),
+                     breaks = tweets_freq$count*4)
+```
+**Observation:**
+
+## 2.4 Time Series
+
+### 2.4.1. Trend analysis for different sentiments for each day of the week.
+
+Extracting all the sentiments from the sentiments and date column to determine the sentiments related to each day. **All the counts related to the sentiments are mentioned in the original source code. We are reporting only the graphs for easier readability.**
+
+```{r, include=FALSE}
+tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='positive') %>%
+  summarize(Count=n()) %>%
+  arrange(desc(Count)) %>%
+  arrange(Day)
+```
+
+```{r fig.align='center',out.width = '60%', echo=FALSE, message=FALSE, results='hide',fig.keep='all'}
+# Visualizing the results
+  pos <-
+  tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='positive') %>%
+  count(sentiment='positive')
+ggplot(data=pos,mapping=aes(x=Day, y=n, group=1)) + geom_line() + xlab('Day') + geom_point()+
+  ggtitle("Positive Sentiment over the days")
+
+neg <-
+  tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='negative') %>%
+  count(sentiment='negative')
+ggplot(data=neg,mapping=aes(x=Day, y=n, group=1)) + geom_line() + xlab('Day') + geom_point()+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Negative Sentiment over the days")
+
+ant <-
+  tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='anticipation') %>%
+  count(sentiment='anticipation')
+ggplot(data=ant,mapping=aes(x=Day, y=n, group=1)) + geom_line() + xlab('Day') + geom_point()+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Anticipation Sentiment over the days")
+
+joy <-
+  tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='joy') %>%
+  count(sentiment='joy')
+ggplot(data=joy,mapping=aes(x=Day, y=n, group=1)) + geom_line() + xlab('Day') + geom_point()+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Joy Sentiment over the days")
+
+trust <-
+  tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='trust') %>%
+  count(sentiment='trust')
+ggplot(data=trust,mapping=aes(x=Day, y=n, group=1)) + geom_line() + xlab('Day') + geom_point()+
+  theme(plot.title = element_text(hjust = 0.5)) +
+  ggtitle("Trust Sentiment over the days")
+
+
+```
+
+
+```{r, include=FALSE}
+tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='anticipation') %>%
+  summarize(Count=n()) %>%
+  arrange(desc(Count))
+```
+
+
+```{r, include=FALSE}
+tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='joy') %>%
+  summarize(Count=n()) %>%
+  arrange(desc(Count))
+```
+
+
+```{r, include=FALSE}
+tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='trust') %>%
+  summarize(Count=n()) %>%
+  arrange(desc(Count))
+```
+
+
+```{r, include=FALSE}
+tidy_tweets %>%
+  group_by(Day,sentiment) %>%
+  filter(sentiment=='negative') %>%
+  count(sentiment=='negative') %>%
+  ggplot(aes(x = Day , y = n)) +
+  geom_bar(aes(fill='sentiment'),stat = "identity")+
+  theme(legend.position="none")+
+  xlab("Day") +
+  ylab("Count")+
+  ggtitle("Different Day vs negative")
+  theme_minimal()
+```
+
+```{r, include=FALSE}
+View(tidy_tweets)
+tweets_day <- 
+  tidy_tweets %>%
+  group_by(Day) %>%
+  summarise(count = n())
+tweets_day
+```
+
+**Observation:** From all the above graphs, we observe that
+
+### 2.4.1 Trend analysis looking at number of tweets per day of the week
+
+```{r fig.align="center", echo=FALSE,out.width = '60%', message=FALSE, results='hide',fig.keep='all'}
+# Visualizing the results
+tidy_tweets %>%
+count(Day) %>%
+  ggplot(aes(x = Day, y = n)) +
+  geom_bar(aes(fill=Day),stat = "identity")+
+  theme(legend.position="none")+
+  xlab("Day") +
+  ylab("Count")+
+  ggtitle("Different Day vs Count")
+  theme_minimal()
+```
+
+
+### RQA analysis
+
+```{r fig.align="center",out.width = '60%', echo=FALSE, message=FALSE, results='hide',fig.keep='last'}
+
+page_df <- data.frame(page$Page.Loads)
+
+colnames(page_df) <- c("Loads")
+
+page_load <- page_df %>% 
+  mutate(text = str_remove_all(Loads, ","))
+
+page_load$text <- as.integer(page_load$text)
+
+ts2 <- page_load$text[1000:1200]
+ts2 <- ts2/1000
+rqa.analysis=rqa(time.series = ts2, embedding.dim=2, time.lag=1,
+                 radius=0.1,lmin=1,do.plot=FALSE,distanceToBorder=2)
+plot(rqa.analysis)
+#rqa.analysis
+
+
+```
+
+**observation:** From the RQA graph, it is interpreted that
+
+### Degree of Permutation Entropy and Complexity
+
+![The Permutation Entropy and Complexity of the tweet numbers](entropy and complexity.png){ width=50% }
+
+**Observations:**
+
+### Number of Tweets over 3 Months
+
+![Number of Tweets over time](number of tweets perday.png){ width=50% }
+
+**Observation:**
+
+# Summary
+
+After careful analysis of 1.6 million worth of twitter data, We were able to decipher lot of emerging patterns and visualize them. We were able to gain valuable insights about our business questions through various plots,text analysis/mining, clustering, probability and time series data.
+
+**All students of Group 9 - Thomas George Thomas, Yang Liu, Pratyush Pothuneedi contributed equally to the project.**
