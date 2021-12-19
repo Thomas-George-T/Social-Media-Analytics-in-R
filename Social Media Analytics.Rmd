@@ -180,7 +180,7 @@ tidy_tweets$date <- as.integer(tidy_tweets$date)
 
 
 ## 2.2 Clustering Analysis
-### 2.2.1 Hierarchical clustering words by sentiments
+### Hierarchical clustering words by sentiments
 
 ```{r fig.align="center", echo=FALSE, out.width = '70%', message=FALSE, results='hide',fig.keep='last'}
 
@@ -202,7 +202,8 @@ plot(hc, hang=-1)
 rect.hclust(hc, k=12)
 
 ```
-Since our data set comprises of text data, we make a corpus and utilize Hierarchical clustering technique. This technique gives us a dendrogram of different words grouped together by sentiments.
+
+Since our data set comprises of text data, we make a corpus and utilize Hierarchical clustering technique. This technique gives us a dendrogram of different words grouped together by sentiments. The number of clusters in hierarchical clustering is given as a range while trying to plot it. Using the suggested range, we can chose the number of clusters. We have chosen to go with 12 as the number of clusters.
 
 **Observation**: The above Dendrogram clusters our sample space into 12 clusters grouped by sentiments. The height of the Dendrogram signifies the distance between the clusters.
 
@@ -251,7 +252,8 @@ ggplot(tweets_freq, aes(count, pickup_pmf)) +
   scale_x_continuous("Time", labels = as.character(tweets_freq$count),
                      breaks = tweets_freq$count*4)
 ```
-**Observation:**
+**Observation:** The probability of tweets is reducing over time in an exponential scale for a given period.The probability is highest in the start of the time chosen.
+
 
 ## 2.4 Time Series
 
@@ -368,7 +370,7 @@ tweets_day <-
 tweets_day
 ```
 
-**Observation:** From all the above graphs, we observe that
+**Observation:** From all the above graphs, we observe that positive sentiments of tweets increases till sunday and then drastically decreases afterwards. The negative sentiments starts increasing till Saturday and then decreases.The other sentiments shown the graphs also follow a similar pattern to that of postive sentiment.
 
 ### 2.4.1 Trend analysis looking at number of tweets per day of the week
 
@@ -384,7 +386,7 @@ count(Day) %>%
   ggtitle("Different Day vs Count")
   theme_minimal()
 ```
-
+**Observation:** Top three days for tweeting are Saturday, Sunday and Monday which should be inline with the start of the weekend and the work week. Meanwhile Wednesday and Thursday have the lowest number of tweets as it's in the middle of the week. 
 
 ### RQA analysis
 
@@ -409,21 +411,21 @@ plot(rqa.analysis)
 
 ```
 
-**observation:** From the RQA graph, it is interpreted that
+**observation:** From the RQA graph, it is observed that there are single isolated points. This can be interpreted as heavy fluctuation and the process may be an uncorrelated random or even anti-correlated process. Therefore, the number of page loads and the texts in the tweets are uncorrelated.
 
 ### Degree of Permutation Entropy and Complexity
 
 ![The Permutation Entropy and Complexity of the tweet numbers](entropy and complexity.png){ width=50% }
 
-**Observations:**
+**Observations:** The permutation entropy is so high and the complexity near to zero. This means that there is no relationship between the dates and the day.
 
-### Number of Tweets over 3 Months
+### Number of Tweets per day over a period of 3 Months
 
 ![Number of Tweets over time](number of tweets perday.png){ width=50% }
 
-**Observation:**
+**Observation:** The trend of the number of tweets in three months. During may the trend changes dramatically and there are three highest number of tweets in may. 
 
-# Summary
+# 3. Summary
 
 After careful analysis of 1.6 million worth of twitter data, We were able to decipher lot of emerging patterns and visualize them. We were able to gain valuable insights about our business questions through various plots,text analysis/mining, clustering, probability and time series data.
 
