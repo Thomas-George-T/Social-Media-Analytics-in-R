@@ -1,39 +1,72 @@
-# Clustering Social Media Tweets
-Clustering the dataset based on the text/words to show different emotions like depression, happiness, neutral,  Ads and promotions etc. Techniques used include probability, clustering, text-analysis and time series analysis
+# Social Media Analytics in R
 
-## Dataset
-https://www.kaggle.com/kazanova/sentiment140
+Taking a look at data of 1.6 million twitter users and drawing useful insights while exploring interesting patterns. The techniques used include text mining, sentimental analysis, probability,time series analysis and Hierarchical clustering on text/words.
 
-Time series Data: https://www.kaggle.com/bobnau/daily-website-visitors
+## 1.1 Data Description
 
-## Business Questions
+We use two different files in our data sets:
 
-Thomas:
-- **Text Mining (2-3 BQs):** Apply text mining techniques to extract useful information and discover semantic information hidden in texts. You may want to add an additional dataset relevant to your topic to the project that can provide you access to the text database. Support your results with adequate visualizations.
-	
-	1. Visualizing the frequently used unique words
-	2. Sentimental Trends of Tweets Visualized
+1. The *tweets.csv* data set contains 1.6 million tweets with 6 fields as follows:
 
-Pratyush:
-- **Clustering (2 BQs):** Use clustering techniques to cluster data and provide insightful results. demonstrate how you obtained the best number of clusters and complement your clustering results with appropriate plots.
+- target: the polarity of the tweet (0 = negative, 2 = neutral, 4 = positive)
+- ids: The id of the tweet ( 2087)
+- date: the date of the tweet (Sat May 16 23:58:44 UTC 2009)
+- flag: The query (lyx). If there is no query, then this value is NO_QUERY.
+- user: the user that tweeted (robotickilldozr)
+- text: the text of the tweet (Lyx is cool)
 
-	1. Demonstrate using visualize function to determine the number of clusters. (Visualize the results)
-	2. Cluster the tweets based on different sentiments. (Visualize the results)
+2. The *daily-website-visitors.csv* contains 5 years of daily time series data for several measures of traffic with 2167 records and 8 Columns:
 
-Yang:
-- **Time Series Analysis (2 BQs):** to understand how the past influences the future, determine seasonal variance, trends, and future forecast.
+- Row: Unique row number for each record
+- Day: Day of week in text fomr (Sunday, Monday, etc)
+- Day.Of.Week: (Day of week in numeric form (1-7))
+- Date: Date in mm/dd/yyyy format
+- Page.Loads: Daily number of pages loaded
+- Unique.Visits: Daily number of visitors from whose IP addresses there haven't been hits on any page in over 6 hours
+- First.Time.Visits: Number of unique visitors who do not have a cookie identifying them as a previous customer
+- Returning.Visits: Number of unique visitors minus first time visitors
 
-	1. Using the extracted day, determine seasonal variance in number of tweets. (Visualize the results)
-	2. Extract different days of the week from the date column and determine the sentiments related to the day. Make trends based on day of the week and sentiments. (Visualize the results)
+## 1.2 Data Acquisition
 
-Pratyush:
-- **Probability (2-3 BQs):** could include probability distribution calculator, conditional probability, distribution functions, joint distribution, distribution fitting, correlation analysis, or relevant ideas. Feel free to use data visualization to support your answers.
+We acquire both the data sets from Kaggle:
 
-	1. Calculate the probability that each of the sentiments show up on a particular day?
-	2. pmf, cdf table with the dates ( probability of a tweet being posted before a particular date)
+1. https://www.kaggle.com/kazanova/sentiment140
 
-## Professor's Notes for Time series - Integrate into Time series Analysis
-- RQ analysis: make some changes on embedding.dim,time.lag, radius and write your own interpretations.
-- graphs from lab1
-- complexity and permutation - Inclusing our Interpretation of them
+2. https://www.kaggle.com/bobnau/daily-website-visitors
 
+# 2.Analytical Questions 
+
+## 2.1 Text Mining
+
+- Finding the frequently used unique words
+- Sentimental Trends of Tweets
+
+## 2.2 Clustering Analysis
+
+- Hierarchical clustering words by sentiments
+
+## 2.3 Probability
+
+- Calculating the Probability Mass Function (PMF) and Cumulative Distribution Function (CDF)
+- Probability Mass Function over Time
+
+## 2.4 Time Series
+
+- Trend analysis for different sentiments for each day of the week.
+- Trend analysis looking at number of tweets per day of the week
+- RQA (Reccurence Quantification Analysis)
+- Computing Degree of Permutation Entropy and Complexity
+
+![The Permutation Entropy and Complexity of the tweet numbers](entropy and complexity.png)
+
+**Observations:** The permutation entropy is so high and the complexity near to zero. This means that there is no relationship between the dates and the day.
+
+- Number of Tweets per day over a period of 3 Months
+
+![Number of Tweets over time](number of tweets perday.png)
+
+**Observation:** The trend of the number of tweets in three months. During may the trend changes dramatically and there are three highest number of tweets in may. 
+
+# 3. Summary
+
+After careful analysis of 1.6 million worth of twitter data, We were able to decipher lot of emerging patterns and visualize them. We were able to gain valuable insights about our business questions through various plots,text analysis/mining, clustering, probability and time series data.
