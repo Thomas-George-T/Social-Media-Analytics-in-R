@@ -56,16 +56,7 @@ We acquire both the data sets from Kaggle:
 - Trend analysis looking at number of tweets per day of the week
 - RQA (Reccurence Quantification Analysis)
 - Computing Degree of Permutation Entropy and Complexity
-
-![The Permutation Entropy and Complexity of the tweet numbers](entropy and complexity.png)
-
-**Observations:** The permutation entropy is so high and the complexity near to zero. This means that there is no relationship between the dates and the day.
-
 - Number of Tweets per day over a period of 3 Months
-
-![Number of Tweets over time](number of tweets perday.png)
-
-**Observation:** The trend of the number of tweets in three months. During may the trend changes dramatically and there are three highest number of tweets in may. 
 
 # 3. Summary
 
