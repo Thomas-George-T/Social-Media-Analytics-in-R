@@ -1,6 +1,18 @@
+![GitHub top language](https://img.shields.io/github/languages/top/Thomas-George-T/Social-Media-Analytics-in-R?style=flat)
+![GitHub language count](https://img.shields.io/github/languages/count/Thomas-George-T/Social-Media-Analytics-in-R?style=flat)
+![ViewCount](https://views.whatilearened.today/views/github/Thomas-George-T/Social-Media-Analytics-in-R.svg?cache=remove)
+
 # Social Media Analytics in R
 
 Taking a look at data of 1.6 million twitter users and drawing useful insights while exploring interesting patterns. The techniques used include text mining, sentimental analysis, probability,time series analysis and Hierarchical clustering on text/words.
+
+<br>
+
+<p align="center">
+	<a href="#">
+		<img src="https://raw.githubusercontent.com/Thomas-George-T/Thomas-George-T/master/assets/r-lang.svg" alt="R Language" title="R" hspace=80 />
+	</a>
+</p>
 
 ## 1.1 Data Description
 
@@ -34,7 +46,7 @@ We acquire both the data sets from Kaggle:
 
 2. https://www.kaggle.com/bobnau/daily-website-visitors
 
-# 2.Analytical Questions 
+# 2. Analytical Questions 
 
 ## 2.1 Text Mining
 
@@ -58,6 +70,10 @@ We acquire both the data sets from Kaggle:
 - Computing Degree of Permutation Entropy and Complexity
 - Number of Tweets per day over a period of 3 Months
 
-# 3. Summary
+# 3. Report
+
+After conducting our analysis with the available data, we visualize and answer all of the above Analytical questions and consolidate them into the following concise report: [PDF](https://github.com/Thomas-George-T/Social-Media-Analytics-in-R/blob/main/Social-Media-Analytics.pdf)
+
+# 4. Summary
 
 After careful analysis of 1.6 million worth of twitter data, We were able to decipher lot of emerging patterns and visualize them. We were able to gain valuable insights about our business questions through various plots,text analysis/mining, clustering, probability and time series data.
