@@ -1,4 +1,4 @@
-![GitHub top language](https://img.shields.io/github/languages/top/Thomas-George-T/Social-Media-Analytics-in-R?style=flat)
+![GitHub top language](https://img.shields.io/github/languages/top/Thomas-George-T/Social-Media-Analytics-in-R?style=flat?cache=remove)
 ![GitHub language count](https://img.shields.io/github/languages/count/Thomas-George-T/Social-Media-Analytics-in-R?style=flat)
 ![ViewCount](https://views.whatilearened.today/views/github/Thomas-George-T/Social-Media-Analytics-in-R.svg?cache=remove)
 
