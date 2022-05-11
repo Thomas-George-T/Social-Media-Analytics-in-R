@@ -50,25 +50,142 @@ We acquire both the data sets from Kaggle:
 
 ## 2.1 Text Mining
 
-- Finding the frequently used unique words
-- Sentimental Trends of Tweets
+### Finding the frequently used unique words
+
+<p align="center">
+	<a href="#">
+		<img src="assets/Q1.JPG" />
+	</a>
+</p>
+
+For this insight, we consider only the original thought of the user/author. We Remove stop words, username mentions, replies, and Re-tweets so that we only have the “original” tweets and visualize our findings. 
+
+**Observation:** Day is the most frequently used word which has been used around 63,000 times out of the total of 1.6 million tweets. Following that, the words Time, Home, love and night have been used around 30,000 times each.
+
+### Sentimental Trends of Tweets
+
+<p align="center">
+	<a href="#">
+		<img src="assets/Q2.JPG" />
+	</a>
+</p>
+
+By utilizing the nrc library, we find different sentiments in each of the tweets and visualize their counts.
+
+**Observation:** Positive, negative, anticipation are the top three most tweeted sentiments. Another trend is that there are equal number of Anger, disgust and surprise sentiment tweets. A lot of Users have also tweeted about issues that they fear and trust.
 
 ## 2.2 Clustering Analysis
 
-- Hierarchical clustering words by sentiments
+### Hierarchical clustering words by sentiments
+
+<p align="center">
+	<a href="#">
+		<img src="assets/Q3.JPG" />
+	</a>
+</p>
+
+Since our data set comprises of text data, we make a corpus and utilize Hierarchical clustering technique. This technique gives us a dendrogram of different words grouped together by sentiments. The number of clusters in hierarchical clustering is given as a range while trying to plot it. Using the suggested range, we
+can chose the number of clusters. We have chosen to go with 12 as the number of clusters.
+
+**Observation:** The above Dendrogram clusters our sample space into 12 clusters grouped by sentiments. The height of the Dendrogram signifies the distance between the clusters.
 
 ## 2.3 Probability
 
-- Calculating the Probability Mass Function (PMF) and Cumulative Distribution Function (CDF)
-- Probability Mass Function over Time
+### Calculating the Probability Mass Function (PMF) and Cumulative Distribution Function (CDF) of tweet frequency.
+
+|    PMF    |
+|:---------:|
+| 0.1307690 |
+| 0.1087685 |
+| 0.1058048 |
+| 0.0932933 |
+| 0.0937506 |
+
+|    CDF    |
+|:---------:|
+| 0.1307690 |
+| 0.2395376 |
+| 0.3453424 |
+| 0.4386357 |
+| 0.5323863 |
+
+### Probability Mass Function over Time
+
+<p align="center">
+	<a href="#">
+		<img src="assets/Q5.JPG" />
+	</a>
+</p>
+
+**Observation:** The probability of tweets is reducing over time in an exponential scale for a given period. The probability is highest in the start of the time chosen.
 
 ## 2.4 Time Series
 
-- Trend analysis for different sentiments for each day of the week.
-- Trend analysis looking at number of tweets per day of the week
-- RQA (Reccurence Quantification Analysis)
-- Computing Degree of Permutation Entropy and Complexity
-- Number of Tweets per day over a period of 3 Months
+### Trend analysis for different sentiments for each day of the week.
+
+<p align="center">
+	<a href="#">
+		<img src="assets/anticipation_sentiment.JPG" />
+	</a>
+	<br>
+	<a href="#">
+		<img src="assets/joy_sentiment.JPG" />
+	</a>
+	<br>
+	<a href="#">
+		<img src="assets/negative_sentiment.JPG" />
+	</a>
+	<br>
+	<a href="#">
+		<img src="assets/trust_sentiment.JPG" />
+	</a>
+	<br>
+	<a href="#">
+		<img src="assets/positive_sentiment.JPG" />
+	</a>
+</p>
+
+**Observation:** From all the above graphs, we observe that positive sentiments of tweets increases till Sunday and then drastically decreases afterwards. The negative sentiments starts increasing till Saturday and then decreases. The other sentiments shown the graphs also follow a similar pattern to that of postive sentiment.
+
+### Trend analysis looking at number of tweets per day of the week
+
+<p align="center">
+	<a href="#">
+		<img src="assets/Q7.JPG" />
+	</a>
+</p>
+
+**Observation:** Top three days for tweeting are Saturday, Sunday and Monday which should be inline with the start of the weekend and the work week. Meanwhile Wednesday and Thursday have the lowest number of tweets as it’s in the middle of the week.
+
+### RQA (Reccurence Quantification Analysis)
+
+<p align="center">
+	<a href="#">
+		<img src="assets/Q8.JPG" />
+	</a>
+</p>
+
+**Observation:** From the RQA graph, it is observed that there are single isolated points. This can be interpreted as heavy fluctuation and the process may be an uncorrelated random or even anti-correlated process. Therefore, the number of page loads and the texts in the tweets are uncorrelated.
+
+### Computing Degree of Permutation Entropy and Complexity
+
+<p align="center">
+	<a href="#">
+		<img src="assets/Q9.JPG" />
+	</a>
+</p>
+
+**Observations:** The permutation entropy is so high and the complexity near to zero. This means that there is no relationship between the dates and the day.
+
+### Number of Tweets per day over a period of 3 Months
+
+<p align="center">
+	<a href="#">
+		<img src="assets/Q10.JPG" />
+	</a>
+</p>
+
+**Observation:** The trend of the number of tweets in three months. During may the trend changes dramatically and there are three highest number of tweets in may.
 
 # 3. Report
 
